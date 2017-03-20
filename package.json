@@ -18,6 +18,7 @@
     "expression": "0.0.1",
     "morgan": "~1.7.0",
     "request": "^2.81.0",
+    "sequelize": "^3.30.2",
     "serve-favicon": "~2.3.0",
     "thunkify-wrap": "^1.0.4"
   }
