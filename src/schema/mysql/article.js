@@ -1,41 +1,47 @@
+// 每一章的文本
 'use strict';
 
-let schema = sequelize.define('book', {
+let schema = dbs.novel.define('article', {
   id: {
-    type: Sequelize.STRING,
+    type: Sequelize.INTEGER,
     field: 'id',
-    autoIncrement: false,
+    autoIncrement: true,
     primaryKey: true
   },
   name: {
     type: Sequelize.STRING,
     field: 'name',
+    allowNull: false,
   },
-  author_id: {
-    type: Sequelize.STRING(20),
+  authorId: {
+    type: Sequelize.INTEGER,
     field: 'author_id',
   },
-  created_at: {
+  bookId: {
+    type: Sequelize.INTEGER,
+    field: 'book_id',
+  },
+  directorId: {
+    type: Sequelize.INTEGER,
+    field: 'director_id',
+  },
+  createdAt: {
     type: Sequelize.DATE,
     field: 'created_at',
     defaultValue: Sequelize.NOW,
   },
-  updated_at: {
+  updatedAt: {
     type: Sequelize.DATE,
     field: 'updated_at',
     defaultValue: Sequelize.NOW
   }
 }, {
-  tableName: 'book',
+  tableName: 'article',
+  createdAt: false,
+  updatedAt: false,
   indexes: [
     {
-      fields: ['id']
-    }, {
       fields: ['name'],
-    }, {
-      fields: ['updated_at'],
-    }, {
-      fields: ['created_at'],
     }
   ]
 });
