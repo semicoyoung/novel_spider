@@ -1,7 +1,7 @@
 // 每一章的文本
 'use strict';
 
-let schema = dbs.novel.define('article', {
+let schema = dbs.NOVEL.define('article', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',
