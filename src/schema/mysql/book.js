@@ -1,7 +1,7 @@
 //书的信息
 'use strict';
 
-let schema = dbs.HM.define('book', {
+let schema = dbs.NOVEL.define('book', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',

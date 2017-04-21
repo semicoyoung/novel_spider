@@ -1,25 +1,36 @@
 //书的目录
 'use strict';
 
-let schema = dbs.novel.define('director', {
+let schema = dbs.NOVEL.define('director', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',
     autoIncrement: true,
     primaryKey: true
   },
-  name: {
+  bookId: {
     type: Sequelize.STRING,
-    field: 'name',
+    field: 'book_id',
+  },
+  bookName: {
+    type: Sequelize.STRING,
+    field: 'book_name',
+    allowNull: false,
+  },
+  chapterId: {
+    unique: true,
+    type: Sequelize.STRING,
+    field: 'chapter_id',
+    allowNull: false,
+  },
+  chapterTitle: {
+    type: Sequelize.STRING,
+    field: 'chapter_title',
     allowNull: false,
   },
   authorId: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.STRING,
     field: 'author_id',
-  },
-  bookId: {
-    type: Sequelize.INTEGER,
-    field: 'book_id',
   },
   createdAt: {
     type: Sequelize.DATE,
@@ -37,9 +48,13 @@ let schema = dbs.novel.define('director', {
   updatedAt: false,
   indexes: [
     {
-      fields: ['name'],
+      fields: ['book_id'],
+    },
+    {
+      fields: ['chapter_id'],
     }
   ]
 });
 
-module.exports = {};
+schema.sync();
+module.exports = schema;

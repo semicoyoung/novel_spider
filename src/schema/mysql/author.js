@@ -1,7 +1,7 @@
 // 书的作者的信息
 'use strict';
 
-let schema = dbs.novel.define('author', {
+let schema = dbs.NOVEL.define('author', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',

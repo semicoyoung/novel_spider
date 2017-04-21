@@ -1,7 +1,7 @@
 // 书的分类
 'use strict';
 
-let schema = dbs.novel.define('category', {
+let schema = dbs.NOVEL.define('category', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',

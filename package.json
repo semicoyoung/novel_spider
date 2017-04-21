@@ -16,9 +16,15 @@
     "ejs": "~2.4.1",
     "express": "~4.13.4",
     "expression": "0.0.1",
+    "json-stable-stringify": "^1.0.1",
+    "lodash": "^4.17.4",
+    "mongoose": "^4.9.5",
     "morgan": "~1.7.0",
+    "mysql": "^2.13.0",
+    "node-uuid": "^1.4.8",
     "request": "^2.81.0",
     "sequelize": "^3.30.2",
+    "sequelize-xa-plugin": "^1.1.1",
     "serve-favicon": "~2.3.0",
     "thunkify-wrap": "^1.0.4"
   }

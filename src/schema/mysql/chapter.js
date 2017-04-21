@@ -1,29 +1,27 @@
 // 每一章的文本
 'use strict';
 
-let schema = dbs.NOVEL.define('article', {
+let schema = dbs.NOVEL.define('chapter', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',
     autoIncrement: true,
     primaryKey: true
   },
-  name: {
+  chapterTitle: {
     type: Sequelize.STRING,
-    field: 'name',
+    field: 'chapter_title',
     allowNull: false,
   },
-  authorId: {
-    type: Sequelize.INTEGER,
-    field: 'author_id',
+  chapterId: {
+    type: Sequelize.STRING,
+    field: 'chapter_id',
+    allowNull: false,
+    unique: true
   },
-  bookId: {
-    type: Sequelize.INTEGER,
-    field: 'book_id',
-  },
-  directorId: {
-    type: Sequelize.INTEGER,
-    field: 'director_id',
+  content: {
+    type: Sequelize.TEXT,
+    field: 'content',
   },
   createdAt: {
     type: Sequelize.DATE,
@@ -36,12 +34,12 @@ let schema = dbs.NOVEL.define('article', {
     defaultValue: Sequelize.NOW
   }
 }, {
-  tableName: 'article',
+  tableName: 'chapter',
   createdAt: false,
   updatedAt: false,
   indexes: [
     {
-      fields: ['name'],
+      fields: ['chapter_id'],
     }
   ]
 });

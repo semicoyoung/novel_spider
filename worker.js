@@ -121,6 +121,9 @@ let work1 = function* (bookId) {
 setTimeout(function() {
   co(work2('/14_14119')).then(function(data) {
   }, function(err) {
-    console.log('--err: ', err);
-  })
+    if (err) {
+      console.log('--err: ', err);
+      process.exit(0);
+    }
+  });
 },0);
