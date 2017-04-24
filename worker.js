@@ -7,7 +7,7 @@ let co = require('co');
 let thunkify = require('thunkify-wrap');
 let cheerio = require('cheerio');
 let app = express();
-let log = require('util').log;
+let redis = require('redis');
 app.use(require('compression')());
 app.use(require('connect-timeout')(600 * 1000, {respond: false}));
 
@@ -119,7 +119,7 @@ let work1 = function* (bookId) {
 };
 
 setTimeout(function() {
-  co(work2('/14_14119')).then(function(data) {
+  co(work3()).then(function(data) {
   }, function(err) {
     if (err) {
       console.log('--err: ', err);
@@ -127,3 +127,82 @@ setTimeout(function() {
     }
   });
 },0);
+
+
+let pages = [
+  {
+  uri: 'http://www.biquge.com/xuanhuanxiaoshuo/',
+  tag: '玄幻小说',
+  },{
+  uri: 'http://www.biquge.com/xiuzhenxiaoshuo/',
+  tag: '修真小说'
+  },{
+  uri: 'http://www.biquge.com/dushixiaoshuo/',
+  tag: '都市小说',
+  },{
+  uri: 'http://www.biquge.com/lishixiaoshuo/',
+  tag: '历史小说',
+  }, {
+  uri: 'http://www.biquge.com/wangyouxiaoshuo/',
+  tag: '网游小说',
+  }, {
+  uri: 'http://www.biquge.com/kehuanxiaoshuo/',
+  tag: '科幻小说',
+  }, {
+  uri: 'http://www.biquge.com/nvpinxiaoshuo/',
+  tag: '女频小说'
+  }
+];
+
+let getTagUpdateList = function* (uri, tag) {
+  let data;
+  let chapterIds = [];
+  let result = [];
+  try {
+    data = yield thunkify(request)({
+      uri: uri,
+      method: 'get',
+      timeout: 1000 * 60
+    });
+  } catch (err) {
+    console.log('----pull internet page updates failed error: ', err);
+    return chapterIds;
+  }
+
+  let $ = cheerio.load(data[0].body);
+  let list = $('div #main #newscontent .l').children();
+  let ul= list['1'].children;
+  for (let i = 0, len = ul.length; i < len; i++) {
+    if (ul[i].name == 'li') {
+      result.push(ul[i].children);
+    }
+  }
+  for (let i = 0, len = result.length; i < len; i++) {
+    chapterIds.push(result[i][2].children[0].attribs.href)
+  }
+
+  for (let i = 0, len = chapterIds.length; i < len; i++) {
+    let chapter_id = chapterIds[i];
+    let splitLine = chapterIds[i].split('/');
+    let book_id = splitLine[1];
+
+  }
+
+  return chapterIds;
+  //todo: get exists data from cache, and then compare, and then update the new data, and cache new data;
+  //todo: repeat the worker
+};
+
+let work3 = function* () {
+  for (let i = 0, len = pages.length; i < len; i++) {
+    yield getTagUpdateList(pages[i].uri, pages[i].tag);
+  }
+
+  console.log('-=-=-=-=-next round');
+  setTimeout(function(){
+    co(work3()).then(function(){}, function(err) {
+      console.log('---work3 error---: ', err);
+      process.exit(0);
+    });
+  }, 3000);
+};

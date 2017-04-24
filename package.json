@@ -22,6 +22,7 @@
     "morgan": "~1.7.0",
     "mysql": "^2.13.0",
     "node-uuid": "^1.4.8",
+    "redis": "^2.7.1",
     "request": "^2.81.0",
     "sequelize": "^3.30.2",
     "sequelize-xa-plugin": "^1.1.1",
