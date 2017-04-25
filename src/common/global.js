@@ -21,6 +21,7 @@ var redis = require('redis');
 global.cache = redis.createClient(
   config.cache.port,
   config.cache.host,
+  {enable_offline_queue: false}
 );
 global.cache.on('error', function(err) {
   console.log('redis on error: ', err);

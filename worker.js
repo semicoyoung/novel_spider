@@ -17,16 +17,6 @@ app.use(require('cookie-parser')());
 
 let baseUrl = 'http://www.biquge.com';
 
-// app.get('/', function(req, res, next){
-// log(req.method, req.url);
-//  co(function*(){
-//    let data = yield getChapterList('43_43821');
-//    return data;
-//   }).then(function(data){
-//     res.send(data);
-//   })
-// });
-
 process.on('uncaughtException', function (err) {
     console.error('Global:');
     console.error(err);
@@ -37,17 +27,48 @@ let port = 3000;
 app.listen(port);
 console.log('server start up on port: ',port);
 
+let pages = [
+  {
+    uri: 'http://www.biquge.com/xuanhuanxiaoshuo/',
+    tag: '玄幻小说',
+  },{
+    uri: 'http://www.biquge.com/xiuzhenxiaoshuo/',
+    tag: '修真小说'
+  },{
+    uri: 'http://www.biquge.com/dushixiaoshuo/',
+    tag: '都市小说',
+  },{
+    uri: 'http://www.biquge.com/lishixiaoshuo/',
+    tag: '历史小说',
+  }, {
+    uri: 'http://www.biquge.com/wangyouxiaoshuo/',
+    tag: '网游小说',
+  }, {
+    uri: 'http://www.biquge.com/kehuanxiaoshuo/',
+    tag: '科幻小说',
+  }, {
+    uri: 'http://www.biquge.com/nvpinxiaoshuo/',
+    tag: '女频小说'
+  }
+];
+
 // 获取书的目录页的数据：书的目录
 let getChapterList = function* (bookId) {
   let uri = baseUrl + '/' + bookId;
-  let data = yield thunkify(request)({
-    uri: uri,
-    method: 'get'
-  });
+  let chapters = [];
+  let data;
+  try {
+    data = yield thunkify(request)({
+      uri: uri,
+      method: 'get'
+    });
+  } catch (err) {
+    console.log('get chapter list error: ', err);
+    return chapters;
+  }
 
   let $ = cheerio.load(data[0].body);
   let inner = $('div .box_con #list')['0'].children[1].children;
-  let chapters = [];
   for (let i = 0, len = inner.length; i < len; i++) {
     if (inner[i].type && inner[i].type == 'tag' && inner[i].name  && inner[i].name == 'dd') {
       chapters.push({
@@ -58,6 +79,8 @@ let getChapterList = function* (bookId) {
       });
     }
   }
+
+  console.log('----getChapterList done');
 
   return chapters;
 };
@@ -80,17 +103,29 @@ let getArticleContent = function* (articleId) {
   let $ = cheerio.load(data[0].body);
 
   let contents = $('div .content_read .box_con #content').text();
+  console.log('-----getArticleContent');
   return contents;
 }
 
-let work2 = function* (bookId) {
+let workUpdateArticle = function* (bookId) {
   let chapterInfo = yield model.mysql.novel.director.findAll({where: {bookId: bookId}, raw: true});
-  chapterInfo = _.orderBy(chapterInfo, function(item) {
-    return item.chapterId;
-  }, 'asc');
+  if (!chapterInfo || !chapterInfo.length) {
+    return ;
+  }
 
-  for (let  i = 0; i < chapterInfo.length; i++) {
-    let chapter = chapterInfo[i];
+  let chapterObj = {};
+  for (let i = 0, len = chapterInfo.length; i < len; i++) {
+    chapterObj[chapterInfo[i].chapterId] = chapterInfo[i];
+  }
+
+  let chapterIds = Object.keys(chapterObj);
+
+  let existsChapter = yield model.mysql.novel.chapter.findAll({where: {chapterId: {$in: chapterIds}}, attributes: ['chapterId', 'chapterId']});
+
+  let newChapter = _.difference(chapterIds, existsChapter);
+
+  for (let i = 0, len = newChapter.length; i < len; i++) {
+    let chapter = chapterObj[newChapter[i]];
     let content = '';
     try {
       content = yield getArticleContent(chapter.chapterId);
@@ -107,52 +142,46 @@ let work2 = function* (bookId) {
       where: {
         chapterId: chapter.chapterId,
         chapterTitle: chapter.chapterTitle,
-    },defaults: {
+      },defaults: {
         content: content
       }});
   }
+
+  console.log('----workUpdateArticle done');
 };
 
-let work1 = function* (bookId) {
+let workUpdateChapterList = function* (bookId) {
   let chapterList = yield getChapterList(bookId);
-  yield model.mysql.novel.director.bulkCreate(chapterList);
-};
-
-setTimeout(function() {
-  co(work3()).then(function(data) {
-  }, function(err) {
-    if (err) {
-      console.log('--err: ', err);
-      process.exit(0);
+  if (chapterList.length) {
+    let chapterIdSet = new Set();
+    let chapterObj = {};
+    for (let i = 0, len = chapterList.length; i < len; i++) {
+      chapterIdSet.add(chapterList[i].chapterId);
+      chapterObj[chapterList[i].chapterId] = chapterList[i];
     }
-  });
-},0);
+    let chapterIds = Array.from(chapterIdSet);
+    //get exists chapter info
+    let existsChapter = yield model.mysql.novel.director.findAll({
+      where: {
+        chapterId: {$in: chapterIds}
+      }
+    });
 
+    let existsChapterIds = [];
+    for (let i = 0, len = existsChapter.length; i < len; i++) {
+      existsChapterIds.push(existsChapter[i].chapterId);
+    }
 
-let pages = [
-  {
-  uri: 'http://www.biquge.com/xuanhuanxiaoshuo/',
-  tag: '玄幻小说',
-  },{
-  uri: 'http://www.biquge.com/xiuzhenxiaoshuo/',
-  tag: '修真小说'
-  },{
-  uri: 'http://www.biquge.com/dushixiaoshuo/',
-  tag: '都市小说',
-  },{
-  uri: 'http://www.biquge.com/lishixiaoshuo/',
-  tag: '历史小说',
-  }, {
-  uri: 'http://www.biquge.com/wangyouxiaoshuo/',
-  tag: '网游小说',
-  }, {
-  uri: 'http://www.biquge.com/kehuanxiaoshuo/',
-  tag: '科幻小说',
-  }, {
-  uri: 'http://www.biquge.com/nvpinxiaoshuo/',
-  tag: '女频小说'
+    let newChapterIds = _.difference(chapterIds, existsChapterIds);
+    let newChapters = [];
+    for (let i = 0, len = newChapterIds.length; i < len; i++) {
+      newChapters.push(chapterObj[newChapterIds[i]]);
+    }
+    yield model.mysql.novel.director.bulkCreate(newChapters);
   }
-];
+
+  console.log('------workUpdateChapterList done');
+};
 
 let getTagUpdateList = function* (uri, tag) {
   let data;
@@ -182,27 +211,105 @@ let getTagUpdateList = function* (uri, tag) {
   }
 
   for (let i = 0, len = chapterIds.length; i < len; i++) {
-    let chapter_id = chapterIds[i];
+    let chapterId = chapterIds[i];
     let splitLine = chapterIds[i].split('/');
-    let book_id = splitLine[1];
-
+    let bookId = splitLine[1];
+    try {
+      yield model.mysql.novel.taskPull.findOrCreate({
+        where: {
+          bookId: bookId,
+          chapterId: chapterId,
+          tag: tag
+        },
+        defaults: {
+          bookId: bookId,
+          chapterId: chapterId,
+          tag: tag,
+          status: 'pending'
+        }
+      });
+    } catch (error) {
+      console.log('---create new task error: ', error);
+    }
   }
-
-  return chapterIds;
-  //todo: get exists data from cache, and then compare, and then update the new data, and cache new data;
-  //todo: repeat the worker
+  console.log('-=-=-=--=-=-getTagUpdateList done');
 };
 
-let work3 = function* () {
+let work = function* () {
   for (let i = 0, len = pages.length; i < len; i++) {
     yield getTagUpdateList(pages[i].uri, pages[i].tag);
   }
 
-  console.log('-=-=-=-=-next round');
+  console.log('-=-=-=-=-word done： ', new Date());
   setTimeout(function(){
-    co(work3()).then(function(){}, function(err) {
+    co(work()).then(function(){}, function(err) {
       console.log('---work3 error---: ', err);
       process.exit(0);
     });
   }, 3000);
 };
+
+let workUpdateBook = function* () {
+  let task = yield model.mysql.novel.taskPull.findOne({
+    where: {
+      status: 'pending'
+    }
+  });
+
+  if (task && task.bookId) {
+    // create a new book item if not exists
+    yield model.mysql.novel.book.findOrCreate({
+      where: {
+        bookId: task.bookId,
+        tag: task.tag
+      },
+      default: {
+        bookId: task.bookId,
+        tag: task.tag
+      }
+    });
+
+    yield workUpdateChapterList(task.bookId);
+    yield workUpdateArticle(task.bookId);
+
+    try {
+      yield model.mysql.novel.taskPull.update({
+        status: 'success',
+        bookId: task.bookId,
+        chapterId: task.chapterId,
+        tag: task.tag,
+        updatedAt: new Date()
+      },{
+        where: {
+          id: task.id
+        }
+      });
+    } catch (err) {
+      console.log('---update task pull error: ', err);
+    }
+  }
+  console.log('----workUpdateBook done');
+
+  setTimeout(function() {
+    co(workUpdateBook()).then(function(){}, function(err) {
+      if (err) {
+        console.log(err);
+        process.exit(0);
+      }
+    });
+  }, 0);
+};
+
+co(work()).then(function(){
+  co(workUpdateBook()).then(function() {}, function(err) {
+    if (err) {
+      console.log(err);
+      process.exit(0);
+    }
+  });
+}, function(err) {
+  if(err){
+    console.log(err);
+    process.exit(0);
+  }
+});

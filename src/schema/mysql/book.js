@@ -8,10 +8,17 @@ let schema = dbs.NOVEL.define('book', {
     autoIncrement: true,
     primaryKey: true
   },
+  bookId: {
+    type: Sequelize.STRING,
+    field: 'book_id',
+  },
+  tag: {
+    type:  Sequelize.STRING,
+    field: 'tag',
+  },
   name: {
     type:  Sequelize.STRING,
     field: 'name',
-    allowNull: false
   },
   createdAt: {
     type: Sequelize.DATE,

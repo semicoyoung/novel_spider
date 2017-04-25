@@ -15,7 +15,6 @@ let schema = dbs.NOVEL.define('director', {
   bookName: {
     type: Sequelize.STRING,
     field: 'book_name',
-    allowNull: false,
   },
   chapterId: {
     unique: true,

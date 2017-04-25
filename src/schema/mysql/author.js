@@ -11,7 +11,6 @@ let schema = dbs.NOVEL.define('author', {
   name: {
     type: Sequelize.STRING,
     field: 'name',
-    allowNull: false,
   },
   createdAt: {
     type: Sequelize.DATE,
