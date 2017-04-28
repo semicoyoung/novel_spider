@@ -68,12 +68,13 @@ let getChapterList = function* (bookId) {
   }
 
   let $ = cheerio.load(data[0].body);
+  let bookName = $('div .box_con #maininfo #info h1')[0].children[0].data;
   let inner = $('div .box_con #list')['0'].children[1].children;
   for (let i = 0, len = inner.length; i < len; i++) {
     if (inner[i].type && inner[i].type == 'tag' && inner[i].name  && inner[i].name == 'dd') {
       chapters.push({
         bookId: bookId,
-        bookName: '圣墟',
+        bookName: bookName,
         chapterId: inner[i].children[1].attribs.href,
         chapterTitle: inner[i].children[1].children[0].data
       });
@@ -240,7 +241,7 @@ let work = function* () {
     yield getTagUpdateList(pages[i].uri, pages[i].tag);
   }
 
-  console.log('-=-=-=-=-word done： ', new Date());
+  console.log('-=-=-=-=-work done： ', new Date());
   setTimeout(function(){
     co(work()).then(function(){}, function(err) {
       console.log('---work3 error---: ', err);
