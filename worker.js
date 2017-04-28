@@ -121,9 +121,13 @@ let workUpdateArticle = function* (bookId) {
 
   let chapterIds = Object.keys(chapterObj);
 
-  let existsChapter = yield model.mysql.novel.chapter.findAll({where: {chapterId: {$in: chapterIds}}, attributes: ['chapterId', 'chapterId']});
+  let existsChapter = yield model.mysql.novel.chapter.findAll({where: {chapterId: {$in: chapterIds}}, attributes: ['chapterId', 'chapterId'], raw:true});
+  let existsChapterIds = [];
+  for (let i = 0, len = existsChapter.length; i < len; i++) {
+    existsChapterIds.push(existsChapter[i].chapterId);
+  }
 
-  let newChapter = _.difference(chapterIds, existsChapter);
+  let newChapter = _.difference(chapterIds, existsChapterIds);
 
   for (let i = 0, len = newChapter.length; i < len; i++) {
     let chapter = chapterObj[newChapter[i]];
