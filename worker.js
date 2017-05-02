@@ -251,7 +251,7 @@ let work = function* () {
       console.log('---work3 error---: ', err);
       process.exit(0);
     });
-  }, 3000);
+  }, 60000 * 10);
 };
 
 let workUpdateBook = function* () {
