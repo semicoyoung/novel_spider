@@ -158,13 +158,6 @@ let workUpdateArticle = function* (bookId) {
         console.log('---bulk create content error: ', err)
       }
     }
-    // yield model.mysql.novel.chapter.findOrCreate({
-    //   where: {
-    //     chapterId: chapter.chapterId,
-    //     chapterTitle: chapter.chapterTitle,
-    //   },defaults: {
-    //     content: content
-    //   }});
   }
   if (row.length) {
     try {
@@ -285,6 +278,22 @@ let workUpdateBook = function* () {
   });
 
   if (task && task.bookId) {
+    // update task status to running
+    try {
+      yield model.mysql.novel.taskPull.update({
+        status: 'running',
+        bookId: task.bookId,
+        chapterId: task.chapterId,
+        tag: task.tag,
+        updatedAt: new Date()
+      }, {
+        where: {
+          id: task.id
+        }
+      });
+    } catch (error) {
+      console.log('--update task status to running error: ', error);
+    }
     // create a new book item if not exists
     yield model.mysql.novel.book.findOrCreate({
       where: {
