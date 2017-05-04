@@ -129,6 +129,7 @@ let workUpdateArticle = function* (bookId) {
 
   let newChapter = _.difference(chapterIds, existsChapterIds);
 
+  let row = [];
   for (let i = 0, len = newChapter.length; i < len; i++) {
     let chapter = chapterObj[newChapter[i]];
     let content = '';
@@ -143,13 +144,35 @@ let workUpdateArticle = function* (bookId) {
       continue;
     }
 
-    yield model.mysql.novel.chapter.findOrCreate({
-      where: {
-        chapterId: chapter.chapterId,
-        chapterTitle: chapter.chapterTitle,
-      },defaults: {
-        content: content
-      }});
+    row.push({
+      chapterId: chapter.chapterId,
+      chapterTitle: chapter.chapterTitle,
+      content: content
+    });
+    if (row.length >= 10) {
+      try {
+        yield model.mysql.novel.chapter.bulkCreate(row);
+        row = [];
+        console.log('----bulk create done');
+      } catch (err) {
+        console.log('---bulk create content error: ', err)
+      }
+    }
+    // yield model.mysql.novel.chapter.findOrCreate({
+    //   where: {
+    //     chapterId: chapter.chapterId,
+    //     chapterTitle: chapter.chapterTitle,
+    //   },defaults: {
+    //     content: content
+    //   }});
+  }
+  if (row.length) {
+    try {
+      yield model.mysql.novel.chapter.bulkCreate(row);
+      row = [];
+    } catch (err) {
+      console.log('---bulk create content error: ', err)
+    }
   }
 
   console.log('----workUpdateArticle done');
