@@ -8,9 +8,9 @@ let schema = dbs.NOVEL.define('author', {
     autoIncrement: true,
     primaryKey: true
   },
-  name: {
-    type: Sequelize.STRING,
-    field: 'name',
+  authorName: {
+    type: Sequelize.STRING(50),
+    field: 'author_name',
   },
   createdAt: {
     type: Sequelize.DATE,
@@ -28,7 +28,9 @@ let schema = dbs.NOVEL.define('author', {
   updatedAt: false,
   indexes: [
     {
-      fields: ['name'],
+      fields: ['id'],
+    }, {
+      fields: ['author_name'],
     }
   ]
 });

@@ -11,14 +11,27 @@ let schema = dbs.NOVEL.define('book', {
   bookId: {
     type: Sequelize.STRING,
     field: 'book_id',
+    unique: true,
+  },
+  bookName: {
+    type:  Sequelize.STRING,
+    field: 'book_name',
   },
   tag: {
     type:  Sequelize.STRING,
     field: 'tag',
   },
-  name: {
-    type:  Sequelize.STRING,
-    field: 'name',
+  bookIntroduction: {
+    type: Sequelize.TEXT,
+    field: 'book_introduction',
+  },
+  bookImageUrl: {
+    type: Sequelize.STRING,
+    field: 'book_image_url',
+  },
+  authorId: {
+    type: Sequelize.INTEGER,
+    field: 'author_id',
   },
   createdAt: {
     type: Sequelize.DATE,
@@ -30,21 +43,15 @@ let schema = dbs.NOVEL.define('book', {
     field: 'updated_at',
     defaultValue: Sequelize.NOW
   },
-  authorId: {
-    type: Sequelize.INTEGER,
-    field: 'author_id',
-  },
-  categoryId : {
-    type: Sequelize.INTEGER,
-    field: 'category_id',
-  },
 },{
   tableName: 'book',
   createdAt: false,
   updatedAt: false,
   indexes: [
     {
-      fields: ['name']
+      fields: ['book_id']
+    }, {
+      fields: ['book_name']
     }
   ]
 });

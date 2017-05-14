@@ -1,16 +1,16 @@
 // 书的分类
 'use strict';
 
-let schema = dbs.NOVEL.define('category', {
+let schema = dbs.NOVEL.define('tag', {
   id: {
     type: Sequelize.INTEGER,
     field: 'id',
     autoIncrement: true,
     primaryKey: true
   },
-  name: {
+  tagName: {
     type: Sequelize.STRING,
-    field: 'name',
+    field: 'tag_name',
   },
   createdAt: {
     type: Sequelize.DATE,
@@ -23,12 +23,12 @@ let schema = dbs.NOVEL.define('category', {
     defaultValue: Sequelize.NOW
   }
 }, {
-  tableName: 'category',
+  tableName: 'tag',
   createdAt: false,
   updatedAt: false,
   indexes: [
     {
-      fields: ['name'],
+      fields: ['id'],
     }
   ]
 });

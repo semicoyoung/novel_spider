@@ -27,10 +27,6 @@ let schema = dbs.NOVEL.define('director', {
     field: 'chapter_title',
     allowNull: false,
   },
-  authorId: {
-    type: Sequelize.STRING,
-    field: 'author_id',
-  },
   createdAt: {
     type: Sequelize.DATE,
     field: 'created_at',

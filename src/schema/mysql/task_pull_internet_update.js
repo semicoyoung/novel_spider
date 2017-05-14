@@ -19,9 +19,17 @@ let schema = dbs.NOVEL.define('task_pull_internet_update', {
     type: Sequelize.STRING,
     field: 'chapter_id',
   },
+  chapterTitle: {
+    type: Sequelize.STRING,
+    field: 'chapter_title',
+  },
   tag: {
     type: Sequelize.STRING,
     field: 'tag',
+  },
+  authorName: {
+    type: Sequelize.STRING,
+    field: 'author_name',
   },
   status: {
     type: Sequelize.STRING,
