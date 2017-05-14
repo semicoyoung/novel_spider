@@ -1,6 +1,6 @@
 module.exports = {
 
-  baseUrl: 'http://www.biquge.com',
+  baseUrl: 'http://www.biqudu.com',
 
   mongoDb: {
     host: 'localhost',
