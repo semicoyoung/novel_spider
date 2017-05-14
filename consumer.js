@@ -193,7 +193,6 @@ let work = function* () {
   let task = yield model.mysql.novel.taskPull.findOne({
     where: {
       status: 'pending',
-      authorName: '沐霓裳'
     }
   });
 
