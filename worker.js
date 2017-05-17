@@ -1,56 +1,42 @@
 'use strict';
 require('./src/common/global');
 
-let express = require('express');
 let request = require('request');
 let co = require('co');
 let thunkify = require('thunkify-wrap');
 let cheerio = require('cheerio');
-let app = express();
 let redis = require('redis');
-app.use(require('compression')());
-app.use(require('connect-timeout')(600 * 1000, {respond: false}));
 
-let bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(require('cookie-parser')());
+// let baseUrl = 'http://www.biqudu.com';
 
-let baseUrl = 'http://www.biquge.com';
+// let pages = [
+//   {
+//     uri: 'http://www.biquge.com/xuanhuanxiaoshuo/',
+//     tag: '玄幻小说',
+//   },{
+//     uri: 'http://www.biquge.com/xiuzhenxiaoshuo/',
+//     tag: '修真小说'
+//   },{
+//     uri: 'http://www.biquge.com/dushixiaoshuo/',
+//     tag: '都市小说',
+//   },{
+//     uri: 'http://www.biquge.com/lishixiaoshuo/',
+//     tag: '历史小说',
+//   }, {
+//     uri: 'http://www.biquge.com/wangyouxiaoshuo/',
+//     tag: '网游小说',
+//   }, {
+//     uri: 'http://www.biquge.com/kehuanxiaoshuo/',
+//     tag: '科幻小说',
+//   }, {
+//     uri: 'http://www.biquge.com/nvpinxiaoshuo/',
+//     tag: '女频小说'
+//   }
+// ];
 
-process.on('uncaughtException', function (err) {
-    console.error('Global:');
-    console.error(err);
-    process.exit(0);
-});
+let baseUrl = config.baseUrl;
 
-let port = 3000;
-app.listen(port);
-console.log('server start up on port: ',port);
-
-let pages = [
-  {
-    uri: 'http://www.biquge.com/xuanhuanxiaoshuo/',
-    tag: '玄幻小说',
-  },{
-    uri: 'http://www.biquge.com/xiuzhenxiaoshuo/',
-    tag: '修真小说'
-  },{
-    uri: 'http://www.biquge.com/dushixiaoshuo/',
-    tag: '都市小说',
-  },{
-    uri: 'http://www.biquge.com/lishixiaoshuo/',
-    tag: '历史小说',
-  }, {
-    uri: 'http://www.biquge.com/wangyouxiaoshuo/',
-    tag: '网游小说',
-  }, {
-    uri: 'http://www.biquge.com/kehuanxiaoshuo/',
-    tag: '科幻小说',
-  }, {
-    uri: 'http://www.biquge.com/nvpinxiaoshuo/',
-    tag: '女频小说'
-  }
-];
+let pages = config.pages;
 
 // 获取书的目录页的数据：书的目录
 let getChapterList = function* (bookId) {

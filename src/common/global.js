@@ -16,6 +16,7 @@ global.model = require('./model');
 global.thunkify = require('thunkify-wrap');
 global.request = require('request');
 global.stableStringify = require('json-stable-stringify');
+global.cheerio = require('cheerio');
 
 var redis = require('redis');
 global.cache = redis.createClient(

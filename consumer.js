@@ -20,8 +20,39 @@ let createAuthor = function* (authorName) {
   return null;
 };
 
+let getBookIntroduction = function* (bookId) {
+  let uri = baseUrl + '/' + bookId;
+  let chapters = [];
+  let data;
+  try {
+    data = yield thunkify(request)({
+      uri: uri,
+      method: 'get'
+    });
+  } catch (err) {
+    console.log('get chapter list error: ', err);
+    return chapters;
+  }
+
+  let $ = cheerio.load(data[0].body);
+  let intro = $('div .box_con #maininfo #intro')[0].children;
+  let image = $('div .box_con #sidebar #fmimg img')[0].attribs;
+
+  let introduction = [];
+  for (let i = 0, len = intro.length; i < len; i++) {
+    if (intro[i].type && intro[i].type == 'text') {
+      introduction.push(intro[i].data);
+    }
+  }
+  return {
+    image: image,
+    introduction: introduction,
+  }
+};
+
 let createBook = function* (book) {
   let authorId = yield createAuthor(book.authorName);
+  let bookIntro = yield getBookIntroduction(book.bookId);
   try {
     yield model.mysql.novel.book.findOrCreate({
       where: {
@@ -34,6 +65,8 @@ let createBook = function* (book) {
         chapterTitle: book.chapterTitle,
         tag: book.tag,
         authorId: authorId || '',
+        bookIntroduction: JSON.stringify(bookIntro.introduction),
+        bookImageUrl: JSON.stringify(bookIntro.image),
       }
     })
   } catch (error) {
