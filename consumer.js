@@ -102,7 +102,7 @@ let getChapterList = function* (bookId) {
     }
   }
 
-  console.log('----getChapterList done');
+  //console.log('----getChapterList done');
 
   return chapters;
 };
@@ -156,7 +156,7 @@ let getArticleContent = function* (articleId) {
   let $ = cheerio.load(data[0].body);
 
   let contents = $('div .content_read .box_con #content').text();
-  console.log('-----getArticleContent');
+ // console.log('-----getArticleContent');
   return contents;
 }
 
@@ -232,7 +232,7 @@ let work = function* () {
   if (task && task.bookId) {
     // update task status to running
     try {
-      yield model.mysql.taskPull.update({
+      yield model.mysql.novel.taskPull.update({
         status: 'running',
         bookId: task.bookId,
         bookName: task.bookName,
@@ -268,7 +268,7 @@ let work = function* () {
 
     // update task status to success
     try {
-      yield model.mysql.taskPull.update({
+      yield model.mysql.novel.taskPull.update({
         status: 'success',
         bookId: task.bookId,
         bookName: task.bookName,
@@ -286,6 +286,14 @@ let work = function* () {
       console.log('--update task status error: ', error)
     }
   }
+  setTimeout(function () {
+    co(wock()).then(function () {}, function (err) {
+      if (err) {
+        console.log(err);
+        process.exit(0);       
+      }
+    })
+  },0);
 };
 
 co(work()).then(function () {}, function (err) {
@@ -293,4 +301,4 @@ co(work()).then(function () {}, function (err) {
     console.log(err);
     process.exit(0);
   }
-})
+});

@@ -38,7 +38,7 @@ let createTask = function* (url, tag) {
     }
   }
 
-  console.log('---create task done: ', new Date())
+ // console.log('---create task done: ', new Date())
 };
 
 let work = function* () {
