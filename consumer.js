@@ -30,7 +30,7 @@ let getBookIntroduction = function* (bookId) {
       method: 'get'
     });
   } catch (err) {
-    console.log('get chapter list error: ', err);
+    console.log('get chapter list error: ');
     return chapters;
   }
 
@@ -70,7 +70,7 @@ let createBook = function* (book) {
       }
     })
   } catch (error) {
-    console.log('---create book error: ', error);
+    console.log('---create book error: ');
   }
 };
 
@@ -84,7 +84,7 @@ let getChapterList = function* (bookId) {
       method: 'get'
     });
   } catch (err) {
-    console.log('get chapter list error: ', err);
+    console.log('get chapter list error: ');
     return chapters;
   }
 
@@ -149,7 +149,7 @@ let getArticleContent = function* (articleId) {
       timeout: 1000 * 60
     });
   } catch (error) {
-    console.log('---error: ', error);
+    console.log('---error: ');
     return '';
   }
 
@@ -189,7 +189,7 @@ let createContent = function* (bookId) {
     try {
       content = yield getArticleContent(chapter.chapterId);
     } catch (err) {
-      console.log('---get err: ', err);
+      console.log('---get err: ');
     }
 
     if (content == '') {
@@ -208,7 +208,7 @@ let createContent = function* (bookId) {
         row = [];
         console.log('----bulk create done');
       } catch (err) {
-        console.log('---bulk create content error: ', err)
+        console.log('---bulk create content error: ')
       }
     }
   }
@@ -217,7 +217,7 @@ let createContent = function* (bookId) {
       yield model.mysql.novel.chapter.bulkCreate(row);
       row = [];
     } catch (err) {
-      console.log('---bulk create content error: ', err)
+      console.log('---bulk create content error: ')
     }
   }
 };
@@ -247,7 +247,7 @@ let work = function* () {
         }
       });
     } catch (error) {
-      console.log('--update task status error: ', error)
+      console.log('--update task status error: ')
     }
 
 
@@ -283,7 +283,7 @@ let work = function* () {
         }
       });
     } catch (error) {
-      console.log('--update task status error: ', error)
+      console.log('--update task status error: ')
     }
   }
   setTimeout(function () {
