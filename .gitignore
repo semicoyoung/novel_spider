@@ -1,2 +1,8 @@
-.node_modules
-nore_modules
+node_modules
+*.log
+*.csv
+.idea
+public
+config.js
+.DS_Store
+*.swp
