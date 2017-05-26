@@ -43,11 +43,4 @@ module.exports = {
     password : '',
     pool : 10
   },
-
-  cache: {
-    host: 'dev.smartstudy.com',
-    port: 6379,
-    expire: 60,
-    mrExpire: 10,
-  },
 };

@@ -18,23 +18,6 @@ global.request = require('request');
 global.stableStringify = require('json-stable-stringify');
 global.cheerio = require('cheerio');
 
-var redis = require('redis');
-global.cache = redis.createClient(
-  config.cache.port,
-  config.cache.host,
-  {enable_offline_queue: false}
-);
-global.cache.on('error', function(err) {
-  console.log('redis on error: ', err);
-});
-global.cacheGet = function* (key) {
-  var res = yield thunkify(cache.get.bind(cache))(key);
-  return res;
-};
-global.cacheSetex = function*(key, seconds, value) {
-  yield thunkify(cache.setex.bind(cache))(key, seconds, value);
-};
-
 // 全局错误
 global.errors = require('./errors');
 global.Exception = function(code, msg) {
