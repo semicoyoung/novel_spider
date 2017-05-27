@@ -287,7 +287,7 @@ let work = function* () {
     }
   }
   setTimeout(function () {
-    co(wock()).then(function () {}, function (err) {
+    co(work()).then(function () {}, function (err) {
       if (err) {
         console.log(err);
         process.exit(0);       
