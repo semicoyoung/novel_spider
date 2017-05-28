@@ -43,4 +43,11 @@ module.exports = {
     password : '',
     pool : 10
   },
+
+  cache: {
+    host: '127.0.0.1',
+    port: 6379,
+    expire: 60,
+    mrExpire: 10,
+  },
 };

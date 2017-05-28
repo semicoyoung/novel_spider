@@ -25,3 +25,8 @@ global.Exception = function(code, msg) {
   this.msg = msg || errors[code];
   this.stack = new Error(this.code + ': ' + this.msg).stack;
 };
+let Redis = require('ioredis');
+global.redis = new Redis({
+  host: config.cache.host,
+  port: config.cache.port
+});
