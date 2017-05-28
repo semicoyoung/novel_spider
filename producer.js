@@ -16,16 +16,19 @@ let createTask = function* (url, tag) {
 
   let $ = cheerio.load(data[0].body);
   let list = $('div #main #newscontent .l ul')[0].children;
+  let row = [];
   for (let i = 0, len = list.length; i < len; i++) {
     if (list[i].name && list[i].name == 'li') {
       //todo: redis 进行缓存,之后新建任务可以用 bulkcreate 进行批量创建
-      yield model.mysql.novel.taskPull.findOrCreate({
-        where: {
-          bookId: (list[i].children[1].children[0].attribs.href).split('/')[1],
-          chapterId: list[i].children[2].children[0].attribs.href,
-          tag: tag,
-        },
-        defaults: {
+      let bookId = (list[i].children[1].children[0].attribs.href).split('/')[1];
+      let chapterId = list[i].children[2].children[0].attribs.href;
+
+      let cacheResult = yield redis.get(bookId);
+      if (cacheResult && cacheResult == chapterId) {
+        continue;
+      } else if (!cacheResult || cacheResult != chapterId) {
+        yield redis.set(bookId, chapterId, 'EX', 86400);
+        row.push({
           tag: tag,
           bookId: (list[i].children[1].children[0].attribs.href).split('/')[1],
           bookName: list[i].children[1].children[0].children[0].data,
@@ -33,12 +36,25 @@ let createTask = function* (url, tag) {
           chapterTitle: list[i].children[2].children[0].children[0].data,
           authorName: list[i].children[3].children[0].data,
           status: 'pending',
+        });
+        if (row && row.length >= 10) {
+          try {
+            yield model.mysql.novel.taskPull.bulkCreate(row);
+          } catch (err) {
+            console.log('---task bulk create error');
+          }
+          row = [];
         }
-      });
+      }
     }
   }
-
- // console.log('---create task done: ', new Date())
+  if (row && row.length > 0) {
+    try {
+      yield model.mysql.novel.taskPull.bulkCreate(row);
+    } catch (err) {
+      console.log('---task bulk create error');
+    }
+  }
 };
 
 let work = function* () {
