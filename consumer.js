@@ -197,6 +197,12 @@ let createContent = function* (bookId) {
       continue;
     }
 
+    let buf = new Buffer(content);
+    if (buf.length <= 5000) { //每个汉字4字节，每章节最少2000字算，
+      continue;
+    }
+    buf = null;
+
     row.push({
       chapterId: chapter.chapterId,
       chapterTitle: chapter.chapterTitle,
@@ -208,7 +214,7 @@ let createContent = function* (bookId) {
         row = [];
         console.log('----bulk create done');
       } catch (err) {
-        console.log('---bulk create content error: ')
+        throw new Error('---bulk create content error: ');
       }
     }
   }
@@ -217,7 +223,7 @@ let createContent = function* (bookId) {
       yield model.mysql.novel.chapter.bulkCreate(row);
       row = [];
     } catch (err) {
-      console.log('---bulk create content error: ')
+      throw new Error('---bulk create content error: ');
     }
   }
 };
